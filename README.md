@@ -1,37 +1,37 @@
 # 💌 LuvLetter
 
-**LuvLetter** é um SaaS inovador que transforma histórias de amor reais em presentes digitais premium, mesclando Inteligência Artificial Generativa e um design nostálgico em Pixel Art / 8-bit.
-
-A plataforma permite que casais eternizem seus momentos através de uma "Experiência Surpresa" interativa: um baú digital que, ao ser desbloqueado, revela uma carta de amor personalizada e uma galeria fotográfica, embaladas por uma trilha sonora chiptune original.
+O LuvLetter é uma plataforma simples para a criação de presentes digitais personalizados. A proposta é permitir que casais enviem cartas de amor geradas por IA, acompanhadas de uma galeria de fotos, usando uma interface limpa e elegante.
 
 ---
 
-## 🎯 Nossa Proposta de Valor
+## 🎯 O que o projeto faz?
 
-1. **Hiper-Personalização:** Cartas geradas por IA a partir de detalhes reais do casal (traços de personalidade, tempo juntos e interesses).
-2. **Design Afetivo:** Uma interface que foge do óbvio, usando nostalgia e gamificação para criar engajamento emocional.
-3. **Monetização Simples:** Funil de vendas otimizado com preview dinâmico (efeito blur) e conversão via micro-transação com pagamento instantâneo.
+O foco da plataforma é gerar uma experiência de compra rápida e entregar um presente que pareça natural e autêntico:
 
----
-
-## 🛠️ Stack Tecnológica
-
-Nossa arquitetura foi desenhada focando em alta performance, baixo custo de manutenção e escalabilidade serverless:
-
-* **Frontend:** React 18 + Vite + Tailwind CSS
-* **Backend:** Node.js (Express Serverless API)
-* **Banco de Dados:** PostgreSQL (hospedado via Supabase) + Prisma ORM
-* **IA Generativa:** API Groq (LLM para geração ultrarrápida de texto)
-* **Storage de Imagens:** Cloudflare R2 (Alta disponibilidade e custo zero de egress)
-* **Pagamentos:** Integração nativa com MercadoPago API + Webhooks seguros
-* **Infraestrutura / Deploy:** Vercel (Arquitetura Monolítica hospedando frontend e backend no mesmo domínio)
+1. **Textos Humanos:** Usamos a API do Groq com instruções rigorosas para a IA gerar cartas casuais, que soam como mensagens reais do dia a dia, cortando a formalidade poética padrão dos modelos de linguagem.
+2. **Design Elegante:** A interface foge de visuais poluídos. O foco é no minimalismo, simulando um convite digital.
+3. **Fluxo Simples:** O usuário monta a página, revisa o texto, vê uma prévia bloqueada e faz o pagamento via Pix para liberar a URL final.
 
 ---
 
-## 🚀 Como Funciona o Funil de Vendas
+## 🛠️ Tecnologias Utilizadas
 
-1. **Onboarding:** O Remetente acessa a plataforma e preenche o briefing detalhado do relacionamento (características, tempo juntos, estilo).
-2. **Upload Seguros:** O Remetente envia as fotos marcantes do casal diretamente para a nuvem (Cloudflare R2).
-3. **Draft & Revisão (IA):** O sistema gera automaticamente um rascunho premium da carta de amor. O Remetente pode revisar, pedir para a IA reescrever ou aprovar.
-4. **Checkout (Paywall):** O presente final é montado, porém o texto da carta é ofuscado (efeito visual blur). Para desbloquear a versão final compartilhável, o Remetente realiza um pagamento via PIX ou Cartão (MercadoPago).
-5. **A Surpresa (Destinatário):** O Destinatário recebe o link mágico. Ao abrir, a experiência interativa inicia com animações e trilha sonora, revelando a carta de amor limpa e a galeria de fotos.
+A arquitetura foi montada para ser leve, barata e fácil de manter:
+
+* **Frontend:** React 18 + Vite + Tailwind CSS.
+* **Backend:** Node.js com Express (configurado para rodar como Serverless Function).
+* **Banco de Dados:** PostgreSQL (hospedado no Supabase) integrado via Prisma ORM.
+* **Inteligência Artificial:** Groq API para geração rápida de texto com o modelo Llama 3.
+* **Armazenamento de Fotos:** Cloudflare R2.
+* **Pagamentos:** Mercado Pago API com escuta de Webhooks.
+* **Deploy:** Vercel (Frontend e Backend hospedados juntos no mesmo domínio, sem problemas de CORS).
+
+---
+
+## 🚀 Como Funciona o Sistema
+
+1. **Preenchimento:** O usuário acessa o site, informa os nomes, escolhe o "estilo" do casal e clica em algumas tags de interesses comuns (ex: "Séries", "Vinho", "Trilhas").
+2. **Envio das Imagens:** As fotos do casal são enviadas diretamente para o bucket do Cloudflare R2.
+3. **Revisão da Carta:** O sistema gera a carta via IA. O usuário pode ler, pedir para o sistema gerar outra versão ou editar o texto livremente na própria tela.
+4. **Pagamento e Liberação:** A plataforma monta o link final, mas exibe o conteúdo ofuscado. Após o pagamento via Mercado Pago, o sistema confirma o status pelo Webhook e libera o link.
+5. **O Presente Final:** A pessoa que recebe acessa o link, clica em um envelope digital animado na tela e visualiza a carta de amor junto com o carrossel de fotos.
