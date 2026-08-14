@@ -1,117 +1,37 @@
 # 💌 LuvLetter
 
-**Plataforma SaaS de presentes digitais românticos com temática Pixel Art / 8-bit / RPG.**
+**LuvLetter** é um SaaS inovador que transforma histórias de amor reais em presentes digitais premium, mesclando Inteligência Artificial Generativa e um design nostálgico em Pixel Art / 8-bit.
 
-Crie uma carta de amor gerada por IA + galeria de fotos em uma experiência interativa única para o seu Player 2.
-
----
-
-## 📁 Arquitetura do Projeto (Monolito Serverless)
-
-Este projeto foi desenhado para ser implantado como um **monolito** na Vercel (Frontend e Backend compartilhando o mesmo domínio).
-
-```
-LuvLetter/
-├── api/
-│   └── index.js      # Entry point serverless para a Vercel
-├── backend/          # Node.js + Express + Prisma + PostgreSQL (Supabase)
-├── frontend/         # React + Vite + Tailwind CSS
-└── vercel.json       # Configurações de rotas monolíticas para a Vercel
-```
+A plataforma permite que casais eternizem seus momentos através de uma "Experiência Surpresa" interativa: um baú digital que, ao ser desbloqueado, revela uma carta de amor personalizada e uma galeria fotográfica, embaladas por uma trilha sonora chiptune original.
 
 ---
 
-## 🚀 Setup Rápido (Local)
+## 🎯 Nossa Proposta de Valor
 
-### 1. Pré-requisitos
-- Node.js instalado
-- Banco de dados PostgreSQL rodando (ex: Supabase)
-
-### 2. Configurando o Backend
-
-```bash
-cd backend
-npm install
-cp .env.example .env   # Preencha as variáveis (DATABASE_URL, DIRECT_URL, etc)
-npx prisma migrate dev --name init
-npm run dev            # API rodará em http://localhost:3030
-```
-
-### 3. Configurando o Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev            # Frontend rodará em http://localhost:5000 (o Vite fará o proxy das rotas /api para a porta 3030)
-```
+1. **Hiper-Personalização:** Cartas geradas por IA a partir de detalhes reais do casal (traços de personalidade, tempo juntos e interesses).
+2. **Design Afetivo:** Uma interface que foge do óbvio, usando nostalgia e gamificação para criar engajamento emocional.
+3. **Monetização Simples:** Funil de vendas otimizado com preview dinâmico (efeito blur) e conversão via micro-transação com pagamento instantâneo.
 
 ---
 
-## ⚙️ Variáveis de Ambiente (backend/.env)
+## 🛠️ Stack Tecnológica
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | String de conexão para o Supabase (Transaction Pooler - Porta 6543) |
-| `DIRECT_URL` | String de conexão direta para o Supabase (Porta 5432 - Usado apenas para Migrações do Prisma) |
-| `GROQ_API_KEY` | Chave da [Groq Console](https://console.groq.com) |
-| `R2_ACCOUNT_ID` | Account ID do Cloudflare |
-| `R2_ACCESS_KEY_ID` | R2 Access Key |
-| `R2_SECRET_ACCESS_KEY` | R2 Secret |
-| `R2_BUCKET_NAME` | Nome do bucket R2 |
-| `R2_PUBLIC_URL` | URL pública do bucket (ex: `https://cdn.seudominio.com`) |
-| `MERCADOPAGO_ACCESS_TOKEN` | Token do [MercadoPago Developers](https://www.mercadopago.com.br/developers) |
-| `WEBHOOK_SECRET` | Secret do webhook do Mercado Pago para verificação de assinaturas |
-| `APP_URL` | URL pública da sua aplicação (ex: `https://seu-dominio.vercel.app`) |
-| `GIFT_PRICE` | Preço em centavos (padrão: `990` = R$9,90) |
+Nossa arquitetura foi desenhada focando em alta performance, baixo custo de manutenção e escalabilidade serverless:
+
+* **Frontend:** React 18 + Vite + Tailwind CSS
+* **Backend:** Node.js (Express Serverless API)
+* **Banco de Dados:** PostgreSQL (hospedado via Supabase) + Prisma ORM
+* **IA Generativa:** API Groq (LLM para geração ultrarrápida de texto)
+* **Storage de Imagens:** Cloudflare R2 (Alta disponibilidade e custo zero de egress)
+* **Pagamentos:** Integração nativa com MercadoPago API + Webhooks seguros
+* **Infraestrutura / Deploy:** Vercel (Arquitetura Monolítica hospedando frontend e backend no mesmo domínio)
 
 ---
 
-## 🛣️ Rotas da API
+## 🚀 Como Funciona o Funil de Vendas
 
-Todas as rotas do backend são prefixadas com `/api`. Em produção, a Vercel roteia `/api/*` para o nosso backend Node.js.
-
-| Método | Rota | Descrição |
-|---|---|---|
-| POST | `/api/gifts` | Cria um novo presente (Player 1 e Player 2) |
-| POST | `/api/gifts/:id/upload` | Faz o upload de até 6 fotos para o Cloudflare R2 |
-| POST | `/api/gifts/:id/generate` | Gera o primeiro rascunho da carta com Groq IA |
-| GET | `/api/gifts/:id/review` | Retorna o presente para revisão (texto claro) |
-| POST | `/api/gifts/:id/regenerate` | Regera a carta com a IA |
-| POST | `/api/gifts/:id/finalize` | Finaliza a carta (trava edições, cria unique_hash) |
-| GET | `/api/gifts/:id/preview` | Preview do checkout (texto da carta embaçado se não pago) |
-| POST | `/api/checkout` | Gera o link de pagamento do MercadoPago |
-| POST | `/api/webhook` | Recebe as confirmações de pagamento do MercadoPago |
-| GET | `/api/quest/:hash` | Acesso à experiência completa finalizada (apenas se pago) |
-
----
-
-## 🎨 Fluxo do Usuário (Funnel de Vendas)
-
-```
-Home (formulário) → Upload de fotos → Geração → Review (edição/regeneração) → Checkout (preview borrado) → Pagamento PIX/Cartão → Quest Final
-```
-
-1. **Home** — Player 1 preenche o briefing de relacionamento.
-2. **Upload** — Player 1 seleciona até 6 fotos memoráveis.
-3. **Review** — Player 1 lê o rascunho da carta gerada pela IA, edita se quiser ou pede para a IA reescrever.
-4. **Checkout** — A carta agora aparece bloqueada visualmente (efeito de embaçamento). Para desbloquear e gerar o link compartilhável, cobra-se R$ 9,90.
-5. **Quest** — O Player 2 recebe o link. Ao abrir, interage com um "baú" em pixel art, libera a música romântica chiptune e lê a carta juntamente com a galeria.
-
----
-
-## 🛠️ Stack Tecnológica & Produção
-
-- **Infraestrutura**: Vercel (Serverless Functions via `vercel.json`)
-- **Backend**: Node.js, Express.js
-- **Banco de Dados**: PostgreSQL (hospedado no Supabase), Prisma ORM
-- **Frontend**: React 18, Vite, Tailwind CSS, React Router v6
-- **IA Generativa**: Groq API (modelo rápido e avançado)
-- **Object Storage**: Cloudflare R2 (AWS S3 SDK via nativo)
-- **Pagamentos**: MercadoPago API (com Webhooks autenticados)
-- **Áudio**: Howler.js para reprodução garantida em navegadores mobile
-
----
-
-## 🎵 Áudio
-
-A página da "Quest" usa `Howler.js` para tocar sfx chiptune. O design atual tem áudio otimizado para que funcione tanto no mobile quanto no desktop.
+1. **Onboarding:** O Remetente acessa a plataforma e preenche o briefing detalhado do relacionamento (características, tempo juntos, estilo).
+2. **Upload Seguros:** O Remetente envia as fotos marcantes do casal diretamente para a nuvem (Cloudflare R2).
+3. **Draft & Revisão (IA):** O sistema gera automaticamente um rascunho premium da carta de amor. O Remetente pode revisar, pedir para a IA reescrever ou aprovar.
+4. **Checkout (Paywall):** O presente final é montado, porém o texto da carta é ofuscado (efeito visual blur). Para desbloquear a versão final compartilhável, o Remetente realiza um pagamento via PIX ou Cartão (MercadoPago).
+5. **A Surpresa (Destinatário):** O Destinatário recebe o link mágico. Ao abrir, a experiência interativa inicia com animações e trilha sonora, revelando a carta de amor limpa e a galeria de fotos.
