@@ -1,4 +1,4 @@
-# 🎮 Player 2 Luv
+# 💌 LuvLetter
 
 **Plataforma SaaS de presentes digitais românticos com temática Pixel Art / 8-bit / RPG.**
 
@@ -6,34 +6,43 @@ Crie uma carta de amor gerada por IA + galeria de fotos em uma experiência inte
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Arquitetura do Projeto (Monolito Serverless)
+
+Este projeto foi desenhado para ser implantado como um **monolito** na Vercel (Frontend e Backend compartilhando o mesmo domínio).
 
 ```
-player-2-luv/
-├── backend/          # Node.js + Express + Prisma + SQLite
-└── frontend/         # React + Vite + Tailwind CSS
+LuvLetter/
+├── api/
+│   └── index.js      # Entry point serverless para a Vercel
+├── backend/          # Node.js + Express + Prisma + PostgreSQL (Supabase)
+├── frontend/         # React + Vite + Tailwind CSS
+└── vercel.json       # Configurações de rotas monolíticas para a Vercel
 ```
 
 ---
 
-## 🚀 Setup Rápido
+## 🚀 Setup Rápido (Local)
 
-### 1. Backend
+### 1. Pré-requisitos
+- Node.js instalado
+- Banco de dados PostgreSQL rodando (ex: Supabase)
+
+### 2. Configurando o Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # Preencha as variáveis
+cp .env.example .env   # Preencha as variáveis (DATABASE_URL, DIRECT_URL, etc)
 npx prisma migrate dev --name init
-npm run dev            # Roda em http://localhost:3001
+npm run dev            # API rodará em http://localhost:3030
 ```
 
-### 2. Frontend
+### 3. Configurando o Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev            # Roda em http://localhost:5173
+npm run dev            # Frontend rodará em http://localhost:5000 (o Vite fará o proxy das rotas /api para a porta 3030)
 ```
 
 ---
@@ -42,7 +51,8 @@ npm run dev            # Roda em http://localhost:5173
 
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | Caminho SQLite: `file:../data/player2luv.db` |
+| `DATABASE_URL` | String de conexão para o Supabase (Transaction Pooler - Porta 6543) |
+| `DIRECT_URL` | String de conexão direta para o Supabase (Porta 5432 - Usado apenas para Migrações do Prisma) |
 | `GROQ_API_KEY` | Chave da [Groq Console](https://console.groq.com) |
 | `R2_ACCOUNT_ID` | Account ID do Cloudflare |
 | `R2_ACCESS_KEY_ID` | R2 Access Key |
@@ -50,64 +60,58 @@ npm run dev            # Roda em http://localhost:5173
 | `R2_BUCKET_NAME` | Nome do bucket R2 |
 | `R2_PUBLIC_URL` | URL pública do bucket (ex: `https://cdn.seudominio.com`) |
 | `MERCADOPAGO_ACCESS_TOKEN` | Token do [MercadoPago Developers](https://www.mercadopago.com.br/developers) |
-| `APP_URL` | URL pública do seu backend (para webhooks) |
-| `FRONTEND_URL` | URL do frontend (para CORS e redirects) |
-| `GIFT_PRICE` | Preço em centavos (padrão: `2990` = R$29,90) |
+| `WEBHOOK_SECRET` | Secret do webhook do Mercado Pago para verificação de assinaturas |
+| `APP_URL` | URL pública da sua aplicação (ex: `https://seu-dominio.vercel.app`) |
+| `GIFT_PRICE` | Preço em centavos (padrão: `990` = R$9,90) |
 
 ---
 
 ## 🛣️ Rotas da API
 
+Todas as rotas do backend são prefixadas com `/api`. Em produção, a Vercel roteia `/api/*` para o nosso backend Node.js.
+
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/gifts` | Cria um novo presente |
-| POST | `/api/gifts/:id/upload` | Upload de até 6 fotos |
-| POST | `/api/gifts/:id/generate` | Gera carta com Groq IA |
-| GET | `/api/gifts/:id/preview` | Preview (carta borrada se não pago) |
-| POST | `/api/checkout` | Gera link de pagamento MercadoPago |
-| POST | `/api/webhook` | Webhook de pagamento |
-| GET | `/api/quest/:hash` | Acesso público à quest completa (apenas se pago) |
+| POST | `/api/gifts` | Cria um novo presente (Player 1 e Player 2) |
+| POST | `/api/gifts/:id/upload` | Faz o upload de até 6 fotos para o Cloudflare R2 |
+| POST | `/api/gifts/:id/generate` | Gera o primeiro rascunho da carta com Groq IA |
+| GET | `/api/gifts/:id/review` | Retorna o presente para revisão (texto claro) |
+| POST | `/api/gifts/:id/regenerate` | Regera a carta com a IA |
+| POST | `/api/gifts/:id/finalize` | Finaliza a carta (trava edições, cria unique_hash) |
+| GET | `/api/gifts/:id/preview` | Preview do checkout (texto da carta embaçado se não pago) |
+| POST | `/api/checkout` | Gera o link de pagamento do MercadoPago |
+| POST | `/api/webhook` | Recebe as confirmações de pagamento do MercadoPago |
+| GET | `/api/quest/:hash` | Acesso à experiência completa finalizada (apenas se pago) |
 
 ---
 
-## 🎨 Fluxo do Usuário
+## 🎨 Fluxo do Usuário (Funnel de Vendas)
 
 ```
-Home (formulário) → Upload de fotos → Checkout (preview borrado) → Pagamento PIX/Cartão → Quest (experiência completa)
+Home (formulário) → Upload de fotos → Geração → Review (edição/regeneração) → Checkout (preview borrado) → Pagamento PIX/Cartão → Quest Final
 ```
 
-1. **Home** — Player 1 preenche dados (nome, parceiro, tempo juntos, características)
-2. **Upload** — Drag-and-drop de até 6 fotos; ao finalizar, a IA gera a carta
-3. **Checkout** — Preview com carta borrada; CTA de desbloqueio por R$29,90
-4. **Quest** — Baú de tesouro pixelado → clique → música chiptune → carta + galeria RPG
+1. **Home** — Player 1 preenche o briefing de relacionamento.
+2. **Upload** — Player 1 seleciona até 6 fotos memoráveis.
+3. **Review** — Player 1 lê o rascunho da carta gerada pela IA, edita se quiser ou pede para a IA reescrever.
+4. **Checkout** — A carta agora aparece bloqueada visualmente (efeito de embaçamento). Para desbloquear e gerar o link compartilhável, cobra-se R$ 9,90.
+5. **Quest** — O Player 2 recebe o link. Ao abrir, interage com um "baú" em pixel art, libera a música romântica chiptune e lê a carta juntamente com a galeria.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🛠️ Stack Tecnológica & Produção
 
-- **Backend**: Node.js, Express.js, Prisma ORM, SQLite
+- **Infraestrutura**: Vercel (Serverless Functions via `vercel.json`)
+- **Backend**: Node.js, Express.js
+- **Banco de Dados**: PostgreSQL (hospedado no Supabase), Prisma ORM
 - **Frontend**: React 18, Vite, Tailwind CSS, React Router v6
-- **IA**: Groq API (Llama 3.3-70b-versatile)
-- **Storage**: Cloudflare R2 (S3-compatible)
-- **Pagamentos**: MercadoPago (PIX + cartão)
-- **Áudio**: Howler.js
-- **Upload**: Multer (memory storage → R2)
+- **IA Generativa**: Groq API (modelo rápido e avançado)
+- **Object Storage**: Cloudflare R2 (AWS S3 SDK via nativo)
+- **Pagamentos**: MercadoPago API (com Webhooks autenticados)
+- **Áudio**: Howler.js para reprodução garantida em navegadores mobile
 
 ---
 
 ## 🎵 Áudio
 
-A página Quest usa `Howler.js` para:
-- **SFX de moeda** ao abrir o baú
-- **Música chiptune** em loop durante a leitura
-
-Substitua as URLs em `Quest.jsx` pelos seus arquivos de áudio hospedados.
-
----
-
-## 📝 Notas de Desenvolvimento
-
-- Em desenvolvimento, o MercadoPago usa `sandbox_init_point`; em produção, `init_point`
-- O webhook do MercadoPago precisa de uma URL pública (use ngrok para testar localmente)
-- A `unique_hash` usa nanoid(10) para URLs amigáveis
-- Fotos são organizadas em R2 como `gifts/{giftId}/{uuid}.jpg`
+A página da "Quest" usa `Howler.js` para tocar sfx chiptune. O design atual tem áudio otimizado para que funcione tanto no mobile quanto no desktop.
