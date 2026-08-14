@@ -11,7 +11,7 @@ const MAX_FILES = 6
 export default function Upload() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [photos, setPhotos] = useState([]) // { file, preview, id }
+  const [photos, setPhotos] = useState([])
   const [uploading, setUploading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -60,14 +60,13 @@ export default function Upload() {
     setError('')
 
     try {
-      // Step 1: Upload photos
       const formData = new FormData()
       photos.forEach((p) => formData.append('photos', p.file))
 
       await axios.post(`/api/gifts/${id}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => {
-          const progress = Math.round((e.loaded / e.total) * 80) // 0-80%
+          const progress = Math.round((e.loaded / e.total) * 80)
           setUploadProgress(progress)
         },
       })
@@ -76,11 +75,9 @@ export default function Upload() {
       setUploading(false)
       setGenerating(true)
 
-      // Step 2: Generate letter with Groq
       await axios.post(`/api/gifts/${id}/generate`)
       setUploadProgress(100)
 
-      // Navigate to checkout
       setTimeout(() => navigate(`/checkout/${id}`), 500)
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao enviar fotos. Tente novamente.')
@@ -90,7 +87,6 @@ export default function Upload() {
     }
   }
 
-  // Pular fotos: gera a carta em background e segue para o checkout
   async function handleSkip() {
     setGenerating(true)
     setError('')
@@ -111,7 +107,6 @@ export default function Upload() {
         <meta name="robots" content="noindex" />
       </Helmet>
       
-      {/* Header */}
       <header className="pt-12 pb-8 text-center px-4">
         <h1 className="font-serif text-3xl text-gray-900">LuvLetter</h1>
         <div className="flex items-center justify-center gap-4 mt-6">
@@ -126,7 +121,6 @@ export default function Upload() {
         </div>
       </header>
 
-      {/* Main */}
       <main className="flex-1 flex items-start justify-center px-4 py-6">
         <div className="w-full max-w-2xl space-y-8">
           
@@ -136,7 +130,6 @@ export default function Upload() {
               Adicione até 6 fotos especiais de vocês. Elas aparecerão ao final da carta.
             </p>
 
-            {/* Dropzone */}
             <div
               {...getRootProps()}
               className={`
@@ -165,7 +158,6 @@ export default function Upload() {
             </div>
           </Card>
 
-          {/* Photo previews */}
           {photos.length > 0 && (
             <Card className="p-8">
               <h3 className="font-sans text-xs text-gray-400 uppercase tracking-widest mb-6">
@@ -179,7 +171,6 @@ export default function Upload() {
                       alt={`Foto ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
-                    {/* Remove button */}
                     <button
                       onClick={(e) => { e.stopPropagation(); removePhoto(photo.id) }}
                       className="absolute top-2 right-2 bg-white/90 backdrop-blur text-red-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
@@ -193,14 +184,12 @@ export default function Upload() {
             </Card>
           )}
 
-          {/* Error */}
           {error && (
             <p className="text-red-500 text-center text-sm font-medium">
               {error}
             </p>
           )}
 
-          {/* Upload progress */}
           {isProcessing && (
             <Card className="p-8 text-center">
               <p className="font-serif text-lg text-gray-800 mb-4">
@@ -218,7 +207,6 @@ export default function Upload() {
             </Card>
           )}
 
-          {/* Action buttons */}
           <div className="flex flex-col items-center gap-6 mt-8">
             <Button
               variant="primary"

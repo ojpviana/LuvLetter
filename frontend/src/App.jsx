@@ -36,7 +36,6 @@ export default function App() {
             <Route path="/checkout/:id" element={<Checkout />} />
             <Route path="/review/:id" element={<Review />} />
             <Route path="/quest/:hash" element={<Quest />} />
-            {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

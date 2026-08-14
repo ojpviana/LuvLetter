@@ -1,10 +1,5 @@
 import { useState } from 'react'
 
-/**
- * PhotoInventory — Displays photos in a modern minimalist Polaroid grid.
- * 
- * @param {Array<{id: string, url: string}>} photos - Array of photo objects
- */
 export default function PhotoInventory({ photos = [] }) {
   const [selected, setSelected] = useState(null)
 
@@ -12,10 +7,8 @@ export default function PhotoInventory({ photos = [] }) {
 
   return (
     <div className="w-full">
-      {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {photos.map((photo, index) => {
-          // Slight random rotation for polaroid effect
           const rotation = index % 2 === 0 ? 'rotate-1' : '-rotate-2'
           const mt = index % 3 === 1 ? 'md:mt-6' : ''
           
@@ -35,7 +28,6 @@ export default function PhotoInventory({ photos = [] }) {
         })}
       </div>
 
-      {/* Lightbox Modal */}
       {selected && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/90 backdrop-blur-sm"

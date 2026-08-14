@@ -1,13 +1,3 @@
-/**
- * Button — Premium minimalist button component.
- * 
- * @param {string} variant - 'primary' | 'secondary'
- * @param {boolean} disabled
- * @param {boolean} loading
- * @param {string} className - Additional Tailwind classes
- * @param {function} onClick
- * @param {React.ReactNode} children
- */
 export default function Button({
   variant = 'primary',
   disabled = false,

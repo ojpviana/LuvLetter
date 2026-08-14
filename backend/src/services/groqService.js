@@ -22,9 +22,6 @@ Você DEVE retornar a resposta ESTRITAMENTE em formato JSON. O objeto JSON deve 
 4. EXPANSÃO SEGURA: Você pode (e deve) detalhar os sentimentos, a cumplicidade e o quanto é bom estar junto, mas os FATOS (onde, quando, eventos) devem se restringir ESTRITAMENTE ao que o usuário enviou.
 5. ORTOGRAFIA E CONCORDÂNCIA: É OBRIGATÓRIO revisar a gramática. Preste muita atenção na concordância verbal e nominal (ex: O certo é "a gente se diverte juntos" ao invés do errado "a gente se divertir juntos"). O texto deve ser impecável em português.`;
 
-/**
- * Generates a love message using Groq's Llama 3 model.
- */
 async function generateLetter({ traits, player1Name, player2Name, timeTogether, coupleStyle, interests }) {
   const userPrompt = `
 Escreva uma mensagem de ${player1Name} para ${player2Name}.

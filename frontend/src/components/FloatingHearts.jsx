@@ -4,12 +4,11 @@ export default function FloatingHearts({ count = 20, opacityBase = 0.4 }) {
   const [hearts, setHearts] = useState([]);
 
   useEffect(() => {
-    // Generate random properties for each heart
     const newHearts = Array.from({ length: count }).map((_, i) => {
-      const left = Math.random() * 100; // 0 to 100 vw
-      const animationDuration = 8 + Math.random() * 12; // 8s to 20s
-      const animationDelay = -(Math.random() * 20); // -20s to 0s to spread them out
-      const size = 1.2 + Math.random() * 1.5; // 1.2rem to 2.7rem (maiores)
+      const left = Math.random() * 100;
+      const animationDuration = 8 + Math.random() * 12;
+      const animationDelay = -(Math.random() * 20);
+      const size = 1.2 + Math.random() * 1.5;
       const opacity = opacityBase + Math.random() * (1 - opacityBase);
       return { id: i, left, animationDuration, animationDelay, size, opacity };
     });

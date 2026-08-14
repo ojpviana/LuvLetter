@@ -11,7 +11,6 @@ export default function BlurredLetter({ text, isBlurred = false, onPay }) {
         {titulo && <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">{titulo}</h2>}
         <p className="mb-4">{intro}</p>
 
-        {/* The blurred section */}
         <div 
           className={`transition-all duration-500 ${isBlurred ? 'select-none blur-md opacity-60 h-28 overflow-hidden' : ''}`}
           style={{ userSelect: isBlurred ? 'none' : 'text' }}
@@ -23,7 +22,6 @@ export default function BlurredLetter({ text, isBlurred = false, onPay }) {
 
       {isBlurred && (
         <div className="relative z-10 flex flex-col items-center justify-center -mt-20 pb-4">
-          {/* Fundo em gradiente suave para mesclar com o texto cortado */}
           <div className="absolute inset-x-0 top-[-50px] bottom-0 bg-gradient-to-t from-stone-50 via-stone-50/80 to-transparent -z-10 pointer-events-none"></div>
           
           <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-center border border-rose-100/50 w-full max-w-sm mx-auto">

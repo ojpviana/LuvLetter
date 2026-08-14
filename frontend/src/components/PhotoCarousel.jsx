@@ -1,11 +1,5 @@
 import { useState } from 'react'
 
-/**
- * PhotoCarousel — Carrossel clean de fotos para a Quest.
- * Navegação por setas e dots. Foto central em destaque com transição suave.
- *
- * @param {Array<{id: string, url: string}>} photos
- */
 export default function PhotoCarousel({ photos = [] }) {
   const [current, setCurrent] = useState(0)
   const [lightbox, setLightbox] = useState(null)
@@ -22,7 +16,6 @@ export default function PhotoCarousel({ photos = [] }) {
 
   return (
     <div className="w-full select-none">
-      {/* ── Foto principal ── */}
       <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: '4/3' }}>
         {photos.map((photo, i) => (
           <div
@@ -43,7 +36,6 @@ export default function PhotoCarousel({ photos = [] }) {
           </div>
         ))}
 
-        {/* Setas de navegação — só se tiver mais de 1 foto */}
         {photos.length > 1 && (
           <>
             <button
@@ -67,7 +59,6 @@ export default function PhotoCarousel({ photos = [] }) {
           </>
         )}
 
-        {/* Contador no canto */}
         {photos.length > 1 && (
           <div className="absolute bottom-3 right-3 bg-black/30 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full z-10">
             {current + 1} / {photos.length}
@@ -75,7 +66,6 @@ export default function PhotoCarousel({ photos = [] }) {
         )}
       </div>
 
-      {/* ── Dots de navegação ── */}
       {photos.length > 1 && (
         <div className="flex justify-center gap-2 mt-5">
           {photos.map((_, i) => (
@@ -93,7 +83,6 @@ export default function PhotoCarousel({ photos = [] }) {
         </div>
       )}
 
-      {/* ── Thumbnails strip — exibir se > 2 fotos ── */}
       {photos.length > 2 && (
         <div className="flex gap-2 mt-4 overflow-x-auto pb-1">
           {photos.map((photo, i) => (
@@ -110,7 +99,6 @@ export default function PhotoCarousel({ photos = [] }) {
         </div>
       )}
 
-      {/* ── Lightbox ── */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"

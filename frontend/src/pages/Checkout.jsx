@@ -25,7 +25,6 @@ export default function Checkout() {
     try {
       const res = await axios.get(`/api/gifts/${id}/preview`)
       setGift(res.data)
-      // If already paid, redirect to quest
       if (res.data.is_paid) {
         navigate(`/quest/${res.data.unique_hash}`, { replace: true })
       }
@@ -41,7 +40,6 @@ export default function Checkout() {
     setError('')
     try {
       const res = await axios.post('/api/checkout', { gift_id: id })
-      // Redirect to MercadoPago
       window.location.href = res.data.checkout_url
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao gerar pagamento. Tente novamente.')
@@ -79,7 +77,6 @@ export default function Checkout() {
       <Helmet>
         <meta name="robots" content="noindex" />
       </Helmet>
-      {/* Header */}
       <header className="pt-12 pb-8 text-center px-4">
         <h1 className="font-serif text-3xl text-gray-900">LuvLetter</h1>
         <div className="flex items-center justify-center gap-4 mt-6">
@@ -94,7 +91,6 @@ export default function Checkout() {
         </div>
       </header>
 
-      {/* Payment failed/pending notice */}
       {paymentStatus === 'failed' && (
         <div className="px-4 max-w-2xl mx-auto w-full mb-6">
           <div className="bg-red-50 border border-red-100 rounded-md p-4 text-center">
@@ -110,7 +106,6 @@ export default function Checkout() {
       <main className="flex-1 flex items-start justify-center px-4 py-6">
         <div className="w-full max-w-3xl space-y-8">
 
-          {/* Letter preview */}
           <Card className="p-8 md:p-12">
             <div className="flex items-center justify-between mb-8">
               <h3 className="font-serif text-2xl text-gray-800">
@@ -133,10 +128,8 @@ export default function Checkout() {
 
           </Card>
 
-          {/* Two columns: Details & Checkout */}
           <div className="grid md:grid-cols-2 gap-8">
             
-            {/* Gift summary */}
             <Card className="p-8">
               <h2 className="font-sans text-xs text-gray-400 uppercase tracking-widest mb-6">
                 Detalhes da Cápsula
@@ -156,7 +149,6 @@ export default function Checkout() {
               </div>
             </Card>
 
-            {/* CTA — Unlock */}
             <Card className="p-8 flex flex-col justify-center text-center bg-white border-rose-100 shadow-md">
               <div className="font-serif text-3xl text-rose-300 mb-2">♥</div>
               <h2 className="font-serif text-2xl text-gray-900 mb-2">
@@ -166,7 +158,6 @@ export default function Checkout() {
                 Acesso vitalício à cápsula digital
               </p>
 
-              {/* Price */}
               <div className="mb-8">
                 <div className="font-sans text-4xl font-light text-gray-900">
                   R$ 9<span className="text-2xl text-gray-500">,90</span>

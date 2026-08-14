@@ -1,9 +1,5 @@
 const paymentService = require('../services/paymentService');
 
-/**
- * POST /api/checkout
- * Creates a MercadoPago payment preference and returns the checkout URL.
- */
 async function createCheckout(req, res, next) {
   try {
     const { gift_id } = req.body;
@@ -24,8 +20,6 @@ async function createCheckout(req, res, next) {
       });
     }
 
-    // ---- 💳 BLOCO DE PAGAMENTO REAL ----
-    // Create MercadoPago preference
     const { checkoutUrl, sandboxUrl, preferenceId } = await paymentService.createPaymentPreference({
       giftId: gift.id,
       playerName: gift.player1_name,
@@ -42,8 +36,6 @@ async function createCheckout(req, res, next) {
   }
 }
 
-/**
- * POST /api/webhook
 const crypto = require('crypto');
 
 function validateWebhookSignature(req) {
@@ -73,10 +65,6 @@ function validateWebhookSignature(req) {
   return computedHash === hash;
 }
 
-/**
- * Handles MercadoPago payment webhook.
- * Approves the gift when payment is confirmed.
- */
 async function handleWebhook(req, res, next) {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -93,12 +81,10 @@ async function handleWebhook(req, res, next) {
       return res.status(403).json({ error: 'Assinatura inválida.' });
     }
 
-    // MercadoPago sends webhook as JSON
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     const { type, data } = body;
 
-    // Only process payment notifications
     if (type !== 'payment') {
       return res.status(200).json({ received: true });
     }
@@ -108,13 +94,11 @@ async function handleWebhook(req, res, next) {
       return res.status(400).json({ error: 'Payment ID inválido ou ausente no webhook.' });
     }
 
-    // Fetch full payment from MercadoPago to verify status
     const paymentData = await paymentService.getPayment(paymentId);
 
     const { status, external_reference: giftId } = paymentData;
 
     if (status === 'approved' && giftId) {
-      // Update gift to paid
       await global.prisma.gift.update({
         where: { id: giftId },
         data: {

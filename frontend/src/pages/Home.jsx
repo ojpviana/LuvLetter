@@ -4,8 +4,6 @@ import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
 import Button from '../components/Button'
 import Card from '../components/Card'
-
-// ── Dados dos steps ───────────────────────────────────────────────────────────
 const STEPS = [
   { label: 'De', field: 'player1_name', placeholder: 'Seu nome', icon: '✎' },
   { label: 'Para', field: 'player2_name', placeholder: 'Nome do seu amor', icon: '♥' },
@@ -28,7 +26,6 @@ const STYLE_OPTIONS = [
   { id: 'caseiro',     label: 'Caseiros',       emoji: '🛋️' },
 ]
 
-// Interesses filtrados por estilo de casal
 const INTERESTS_BY_STYLE = {
   romantico: [
     { id: 'Jantar Especial',   label: 'Jantar especial',     emoji: '🕯️' },
@@ -90,7 +87,6 @@ const INTERESTS_BY_STYLE = {
 
 const MAX_INTERESTS = 3
 
-// ── Componente ────────────────────────────────────────────────────────────────
 export default function Home() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
@@ -99,7 +95,7 @@ export default function Home() {
     player2_name: '',
     time_together: '',
     couple_style: '',
-    interests: [],   // array de ids selecionados
+    interests: [],
     traits: '',
   })
   const [loading, setLoading] = useState(false)
@@ -111,7 +107,6 @@ export default function Home() {
     ? formData.interests
     : formData[currentStep.field]
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
   function handleChange(e) {
     setFormData((prev) => ({ ...prev, [currentStep.field]: e.target.value }))
     setError('')
@@ -121,7 +116,7 @@ export default function Home() {
     setFormData((prev) => ({
       ...prev,
       couple_style: id,
-      interests: [], // limpa interesses ao trocar de estilo
+      interests: [],
     }))
     setError('')
   }
@@ -133,7 +128,7 @@ export default function Home() {
       if (isSelected) {
         return { ...prev, interests: current.filter((i) => i !== id) }
       }
-      if (current.length >= MAX_INTERESTS) return prev // limite de 3
+      if (current.length >= MAX_INTERESTS) return prev
       return { ...prev, interests: [...current, id] }
     })
     setError('')
@@ -146,7 +141,6 @@ export default function Home() {
   }
 
   function handleNext() {
-    // Validação por step
     if (currentStep.isOptions && !formData.couple_style) {
       setError('Escolha o estilo do casal para continuar.')
       return
@@ -158,7 +152,6 @@ export default function Home() {
         return
       }
     }
-    // Interesses é opcional — pode avançar sem selecionar
 
     if (isLastStep) {
       handleSubmit()
@@ -190,7 +183,6 @@ export default function Home() {
 
   const progressPercent = ((step + 1) / STEPS.length) * 100
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen flex flex-col  text-gray-800 overflow-x-hidden">
       <Helmet>
@@ -199,7 +191,6 @@ export default function Home() {
       </Helmet>
       <div className="relative z-10 flex flex-col min-h-screen">
 
-        {/* Header */}
         <header className="pt-16 pb-8 text-center px-4 animate-fade-in-up relative z-50">
           <h1 className="font-serif text-3xl md:text-5xl text-gray-900 tracking-tight">
             LuvLetter
@@ -210,11 +201,9 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Formulário */}
         <main className="flex-1 flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-lg animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
             <Card>
-              {/* Progress Bar */}
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-sans text-xs text-gray-400 uppercase tracking-widest">
@@ -232,7 +221,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Step label */}
               <label className="block font-serif text-xl text-gray-800 mb-6 flex items-center gap-2">
                 {currentStep.icon && (
                   <span className="text-rose-300 text-2xl">{currentStep.icon}</span>
@@ -240,9 +228,6 @@ export default function Home() {
                 {currentStep.label}
               </label>
 
-              {/* ── Input por tipo de step ── */}
-
-              {/* Estilo do Casal — grid de cards */}
               {currentStep.isOptions && (
                 <div className="grid grid-cols-2 gap-3">
                   {STYLE_OPTIONS.map((opt) => (
@@ -259,7 +244,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Interesses — pills dinâmicas por estilo */}
               {currentStep.isInterests && (() => {
                 const options = INTERESTS_BY_STYLE[formData.couple_style] || []
                 return (
@@ -295,7 +279,6 @@ export default function Home() {
                 )
               })()}
 
-              {/* Textarea */}
               {currentStep.isTextarea && (
                 <textarea
                   className="input-minimal resize-none h-32"
@@ -307,7 +290,6 @@ export default function Home() {
                 />
               )}
 
-              {/* Input de texto padrão */}
               {!currentStep.isOptions && !currentStep.isInterests && !currentStep.isTextarea && (
                 <input
                   className="input-minimal text-lg py-4"
@@ -320,12 +302,10 @@ export default function Home() {
                 />
               )}
 
-              {/* Mensagem de erro */}
               {error && (
                 <p className="font-sans text-sm text-red-400 mt-4">{error}</p>
               )}
 
-              {/* Navegação */}
               <div className="flex gap-4 mt-10 justify-between items-center">
                 {step > 0 ? (
                   <button
@@ -355,7 +335,6 @@ export default function Home() {
           </div>
         </main>
 
-        {/* Footer */}
         <footer className="text-center py-8 font-sans text-gray-300 text-xs tracking-wider">
           LuvLetter © 2026 — Feito com amor
         </footer>

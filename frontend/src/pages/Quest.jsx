@@ -13,7 +13,7 @@ export default function Quest() {
   const navigate = useNavigate()
   const [gift, setGift] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [envelopeState, setEnvelopeState] = useState('closed') // 'closed', 'open'
+  const [envelopeState, setEnvelopeState] = useState('closed')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -43,7 +43,6 @@ export default function Quest() {
     setEnvelopeState('open')
   }
 
-  // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center ">
@@ -57,7 +56,6 @@ export default function Quest() {
     )
   }
 
-  // ── Erro ────────────────────────────────────────────────────────────────────
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 ">
@@ -84,7 +82,6 @@ export default function Quest() {
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      {/* Header */}
       <AnimatePresence>
         {envelopeState === 'open' && (
           <motion.header 
@@ -104,7 +101,6 @@ export default function Quest() {
         )}
       </AnimatePresence>
 
-      {/* Conteúdo */}
       <main className="flex-1 px-4 pb-24 max-w-2xl mx-auto w-full space-y-14">
         
         <AnimatePresence mode="wait">
@@ -129,16 +125,13 @@ export default function Quest() {
             >
 
               
-              {/* Carta */}
               <Card className="p-8 md:p-14">
-                {/* Ornamento decorativo */}
                 <div className="flex items-center gap-4 mb-8">
                   <div className="flex-1 h-[1px] bg-rose-100" />
                   <span className="text-rose-200 text-lg">✦</span>
                   <div className="flex-1 h-[1px] bg-rose-100" />
                 </div>
 
-                {/* Texto da carta */}
                 {gift?.generated_letter ? (
                   <div
                     className="font-serif text-gray-700 leading-[1.95] whitespace-pre-wrap flex flex-col gap-4"
@@ -165,7 +158,6 @@ export default function Quest() {
                   </div>
                 )}
 
-                {/* Assinatura */}
                 <div className="mt-12 pt-8 border-t border-gray-100 text-center">
                   <div
                     className="font-serif italic text-2xl text-gray-800 mb-1"
@@ -183,7 +175,6 @@ export default function Quest() {
                 </div>
               </Card>
 
-              {/* Galeria de fotos */}
               {gift?.photos?.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -200,7 +191,6 @@ export default function Quest() {
                 </motion.div>
               )}
 
-              {/* Footer da cápsula */}
               <motion.div
                 className="text-center pt-8 pb-8"
                 initial={{ opacity: 0 }}

@@ -9,11 +9,6 @@ function parseLetter(letterString) {
   }
 }
 
-/**
- * GET /api/quest/:hash
- * Public endpoint. Returns the full gift ONLY if is_paid is true.
- * If generated_letter is missing, auto-generates it on the spot.
- */
 async function getQuest(req, res, next) {
   try {
     const { hash } = req.params;
@@ -43,9 +38,7 @@ async function getQuest(req, res, next) {
       });
     }
 
-
-    // ── Auto-geração da carta se ausente ──────────────────────────────────────
-    // Acontece quando o usuário pulou a etapa de fotos sem gerar a carta.
+    // Auto-geração caso o usuário tenha pulado a etapa de fotos sem gerar a carta
     let letter = gift.generated_letter;
 
     if (!letter || !letter.trim()) {

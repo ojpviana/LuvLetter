@@ -13,8 +13,6 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const crypto = require('crypto');
 
-// ── Helpers: AWS Signature V4 ────────────────────────────────────────────────
-
 function hmac(key, data) {
   return crypto.createHmac('sha256', key).update(data).digest();
 }
@@ -30,9 +28,6 @@ function getSigningKey(secretKey, date, region, service) {
   return hmac(kService, 'aws4_request');
 }
 
-/**
- * Signs and sends a PUT request to Cloudflare R2 using AWS Signature V4.
- */
 async function r2Put(key, body, contentType) {
   const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -56,7 +51,6 @@ async function r2Put(key, body, contentType) {
     'cache-control': 'public, max-age=31536000',
   };
 
-  // Canonical headers (sorted)
   const sortedHeaderKeys = Object.keys(headers).sort();
   const canonicalHeaders = sortedHeaderKeys.map((k) => `${k}:${headers[k]}`).join('\n') + '\n';
   const signedHeaders = sortedHeaderKeys.join(';');
@@ -104,7 +98,6 @@ async function r2Put(key, body, contentType) {
   return `${process.env.R2_PUBLIC_URL}/${key}`;
 }
 
-// ── Validate R2 config on startup ────────────────────────────────────────────
 function validateR2Config() {
   const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } = process.env;
   const bad = (v) => !v || v.includes('PREENCHA_AQUI');
@@ -120,8 +113,6 @@ function validateR2Config() {
 }
 
 const r2Available = validateR2Config();
-
-// ── Public API ───────────────────────────────────────────────────────────────
 
 async function uploadFile(fileBuffer, originalName, mimeType, giftId) {
   if (!r2Available) {

@@ -8,16 +8,8 @@ const mpClient = new MercadoPagoConfig({
 const preference = new Preference(mpClient);
 const payment = new Payment(mpClient);
 
-const GIFT_PRICE_BRL = parseInt(process.env.GIFT_PRICE || '990', 10) / 100; // Convert cents to BRL (default 9.90)
+const GIFT_PRICE_BRL = parseInt(process.env.GIFT_PRICE || '990', 10) / 100;
 
-/**
- * Creates a MercadoPago payment preference (checkout link + PIX).
- * @param {Object} params
- * @param {string} params.giftId - Gift UUID
- * @param {string} params.playerName - Buyer's name
- * @param {string} params.giftHash - Unique hash for success redirect
- * @returns {Promise<{checkoutUrl: string, preferenceId: string}>}
- */
 async function createPaymentPreference({ giftId, playerName, giftHash }) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     
@@ -57,17 +49,12 @@ async function createPaymentPreference({ giftId, playerName, giftHash }) {
     const response = await preference.create({ body: preferenceData });
 
   return {
-    checkoutUrl: response.init_point, // Full checkout page (card + PIX)
+    checkoutUrl: response.init_point,
     sandboxUrl: response.sandbox_init_point,
     preferenceId: response.id,
   };
 }
 
-/**
- * Fetches a payment by ID from MercadoPago.
- * @param {string} paymentId
- * @returns {Promise<Object>} Payment object
- */
 async function getPayment(paymentId) {
   return payment.get({ id: paymentId });
 }
