@@ -19,12 +19,12 @@ O foco da plataforma é gerar uma experiência de compra rápida e entregar um p
 A arquitetura foi montada para ser leve, barata e fácil de manter:
 
 * **Frontend:** React 18 + Vite + Tailwind CSS.
-* **Backend:** Node.js com Express (configurado para rodar como Serverless Function).
+* **Backend:** Node.js com Express.
 * **Banco de Dados:** PostgreSQL (hospedado no Supabase) integrado via Prisma ORM.
 * **Inteligência Artificial:** Groq API para geração rápida de texto com o modelo Llama 3.
 * **Armazenamento de Fotos:** Cloudflare R2.
 * **Pagamentos:** Mercado Pago API com escuta de Webhooks.
-* **Deploy:** Vercel (Frontend e Backend hospedados juntos no mesmo domínio, sem problemas de CORS).
+* **Deploy:** Vercel.
 
 ---
 
