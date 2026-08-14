@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.vercel/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database files (SQLite legacy)
+data/
+*.db
+*.sqlite
+
+# Prisma generated client (rebuilt on install)
+backend/node_modules/.prisma/
+
+# Local uploads (legacy dev-only fallback)
+backend/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Package lock (opcional — remova esta linha se preferir commitar o lock)
+# package-lock.json
+
+# Test/debug scripts
+backend/testGroq.js
+backend/test-db.js
+backend/clear.js

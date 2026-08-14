@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")    // Supabase pooler (Transaction mode) — usado em runtime
+  directUrl = env("DIRECT_URL")      // Supabase conexão direta — usado para migrações
+}
+
+model Gift {
+  id               String   @id @default(uuid()) @db.Uuid
+  player1_name     String
+  player2_name     String
+  time_together    String
+  traits           String
+  couple_style     String?
+  interests        String?  // Tags selecionadas, ex: "Séries,Viagens,Pet"
+  generated_letter String?  @db.Text // Corpo da carta pode ser longo
+  is_paid          Boolean  @default(false)
+  is_finalized     Boolean  @default(false)
+  unique_hash      String   @unique
+  payment_id       String?  // External payment reference
+  created_at       DateTime @default(now())
+
+  photos           Photo[]
+
+  @@map("gifts")
+}
+
+model Photo {
+  id         String   @id @default(uuid()) @db.Uuid
+  gift_id    String   @db.Uuid
+  image_url  String
+  created_at DateTime @default(now())
+
+  gift       Gift     @relation(fields: [gift_id], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}

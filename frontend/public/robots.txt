@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /quest/
+Disallow: /checkout/
+Disallow: /upload/
+Disallow: /review/
+
+Sitemap: https://player2luv.com.br/sitemap.xml

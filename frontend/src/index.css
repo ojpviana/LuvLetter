@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #fafaf9; /* bg-stone-50 */
+}
+/* ============================================================
+   LUVLETTER — PREMIUM MINIMALIST DESIGN SYSTEM
+   Paleta: off-white stone-50 | grafite gray-800 | rose gold rose-300
+   Tipografia: Playfair Display (serif) + Inter (sans)
+   ============================================================ */
+
+:root {
+  --color-creme:    #FAFAF9;
+  --color-text:     #1F2937;
+  --color-rose:     #F9A8B4; /* rose-300 */
+  --color-rose-dark:#F43F5E; /* rose-500 */
+  --font-serif:     'Playfair Display', Georgia, serif;
+  --font-sans:      'Inter', Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-creme);
+  color: var(--color-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   TIPOGRAFIA
+   ============================================================ */
+.font-serif {
+  font-family: var(--font-serif) !important;
+}
+
+.font-sans {
+  font-family: var(--font-sans) !important;
+}
+
+/* ============================================================
+   ENVELOPE COMPONENT
+   ============================================================ */
+.envelope-wrapper {
+  perspective: 1000px;
+}
+
+.envelope-flap {
+  transform-origin: top;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.envelope-flap.open {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+
+.envelope-letter {
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.25s;
+}
+
+.envelope-letter.open {
+  transform: translateY(-90px);
+  z-index: 10;
+}
+
+/* Lacre pulsante antes de abrir */
+@keyframes seal-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(249, 168, 180, 0.6); }
+  50%       { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(249, 168, 180, 0); }
+}
+
+.envelope-seal {
+  animation: seal-pulse 2s ease-in-out infinite;
+}
+
+.envelope-seal.open {
+  animation: none;
+}
+
+/* ============================================================
+   ANIMAÇÕES DE ENTRADA
+   ============================================================ */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+/* ============================================================
+   COMPONENTES
+   ============================================================ */
+@layer components {
+
+  /* Input limpo com borda fina */
+  .input-minimal {
+    @apply w-full bg-white text-gray-800 px-4 py-3.5 outline-none transition-all duration-300;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+  }
+
+  .input-minimal:focus {
+    border-color: #F9A8B4;
+    box-shadow: 0 0 0 3px rgba(249, 168, 180, 0.15);
+  }
+
+  .input-minimal::placeholder {
+    color: #9CA3AF;
+    font-weight: 400;
+  }
+
+  /* Botão primário — Rose Gold */
+  .btn-primary {
+    @apply bg-rose-300 text-white font-medium py-3.5 px-8 transition-all duration-300 active:scale-95 cursor-pointer;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+    border-radius: 8px;
+    border: none;
+  }
+
+  .btn-primary:not(:disabled):hover {
+    background-color: #f07090;
+    box-shadow: 0 4px 16px rgba(249, 168, 180, 0.35);
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none !important;
+  }
+
+  /* Botão secundário */
+  .btn-secondary {
+    @apply bg-white text-gray-600 font-medium py-3.5 px-6 border border-gray-200 transition-all duration-300 hover:bg-gray-50 active:scale-95 cursor-pointer;
+    font-family: var(--font-sans);
+    border-radius: 8px;
+  }
+
+  /* ---- PILLS / TAGS ---- */
+
+  /* Estilo do Casal — card quadrado */
+  .btn-option {
+    @apply flex flex-col items-center justify-center p-4 border border-gray-200 bg-white transition-all duration-200 hover:border-rose-300 hover:shadow-sm cursor-pointer;
+    border-radius: 12px;
+  }
+
+  .btn-option.selected {
+    @apply border-rose-400 bg-rose-50;
+    box-shadow: 0 0 0 2px rgba(249, 168, 180, 0.5);
+  }
+
+  /* Interesses — pill horizontal arredondada */
+  .tag-pill {
+    @apply inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 border border-transparent transition-all duration-200 cursor-pointer select-none;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+  }
+
+  .tag-pill:hover:not(.selected) {
+    @apply bg-rose-50 text-rose-500 border-rose-200;
+  }
+
+  .tag-pill.selected {
+    @apply bg-rose-100 text-rose-600 border-rose-300 font-semibold;
+  }
+
+  .tag-pill:active {
+    @apply scale-95;
+  }
+}
+
+.image-rendering-pixelated {
+  image-rendering: pixelated;
+}
+
+@keyframes floatHeartVertical {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--heart-opacity, 0.8);
+  }
+  90% {
+    opacity: var(--heart-opacity, 0.8);
+  }
+  100% {
+    transform: translateY(-130vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.animate-float-heart-fixed {
+  animation: floatHeartVertical linear infinite;
+}
