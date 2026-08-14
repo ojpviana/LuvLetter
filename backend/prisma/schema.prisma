@@ -26,6 +26,9 @@ model Gift {
   payment_id       String?  // External payment reference
   created_at       DateTime @default(now())
 
+  coupon_id        String?  @db.Uuid
+  coupon           Coupon?  @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
+
   photos           Photo[]
 
   @@map("gifts")
@@ -40,4 +43,19 @@ model Photo {
   gift       Gift     @relation(fields: [gift_id], references: [id], onDelete: Cascade)
 
   @@map("photos")
+}
+
+model Coupon {
+  id             String   @id @default(uuid()) @db.Uuid
+  code           String   @unique
+  discount_type  String   // "fixed" | "percentage"
+  discount_value Float
+  is_active      Boolean  @default(true)
+  usage_limit    Int?
+  used_count     Int      @default(0)
+  created_at     DateTime @default(now())
+
+  gifts          Gift[]
+
+  @@map("coupons")
 }

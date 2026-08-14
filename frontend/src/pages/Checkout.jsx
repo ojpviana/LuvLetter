@@ -14,6 +14,10 @@ export default function Checkout() {
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
+  const [couponCode, setCouponCode] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState(null)
+  const [couponError, setCouponError] = useState('')
+  const [validatingCoupon, setValidatingCoupon] = useState(false)
   const paymentStatus = searchParams.get('payment')
 
   useEffect(() => {
@@ -35,11 +39,29 @@ export default function Checkout() {
     }
   }
 
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) return
+    setValidatingCoupon(true)
+    setCouponError('')
+    try {
+      const res = await axios.post('/api/coupons/validate', { code: couponCode })
+      setAppliedCoupon(res.data.coupon)
+    } catch (err) {
+      setCouponError(err.response?.data?.error || 'Cupom inválido')
+      setAppliedCoupon(null)
+    } finally {
+      setValidatingCoupon(false)
+    }
+  }
+
   async function handlePay() {
     setPaying(true)
     setError('')
     try {
-      const res = await axios.post('/api/checkout', { gift_id: id })
+      const res = await axios.post('/api/checkout', { 
+        gift_id: id,
+        coupon_code: appliedCoupon?.code
+      })
       window.location.href = res.data.checkout_url
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao gerar pagamento. Tente novamente.')
@@ -158,10 +180,50 @@ export default function Checkout() {
                 Acesso vitalício à cápsula digital
               </p>
 
-              <div className="mb-8">
-                <div className="font-sans text-4xl font-light text-gray-900">
-                  R$ 9<span className="text-2xl text-gray-500">,90</span>
+              {!appliedCoupon ? (
+                <div className="mb-6">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Possui um cupom?"
+                      className="input-minimal flex-1 text-sm py-2 uppercase placeholder:normal-case"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                    />
+                    <Button
+                      variant="secondary"
+                      className="py-2 px-4 text-sm"
+                      onClick={handleApplyCoupon}
+                      loading={validatingCoupon}
+                    >
+                      Aplicar
+                    </Button>
+                  </div>
+                  {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
                 </div>
+              ) : (
+                <div className="mb-6 p-3 bg-emerald-50 border border-emerald-100 rounded-md text-center">
+                  <p className="font-sans text-xs text-emerald-600 font-medium uppercase tracking-widest">
+                    Cupom {appliedCoupon.code} aplicado!
+                  </p>
+                </div>
+              )}
+
+              <div className="mb-8">
+                {appliedCoupon ? (
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="font-sans text-xl text-gray-400 line-through mb-1">
+                      R$ 9,90
+                    </div>
+                    <div className="font-sans text-4xl font-light text-emerald-600">
+                      R$ 1<span className="text-2xl text-emerald-500">,00</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="font-sans text-4xl font-light text-gray-900">
+                    R$ 9<span className="text-2xl text-gray-500">,90</span>
+                  </div>
+                )}
                 <div className="font-sans text-xs text-green-600 font-medium uppercase tracking-widest mt-2">
                   Pagamento Único
                 </div>

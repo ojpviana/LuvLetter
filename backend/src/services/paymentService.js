@@ -8,9 +8,7 @@ const mpClient = new MercadoPagoConfig({
 const preference = new Preference(mpClient);
 const payment = new Payment(mpClient);
 
-const GIFT_PRICE_BRL = parseInt(process.env.GIFT_PRICE || '990', 10) / 100;
-
-async function createPaymentPreference({ giftId, playerName, giftHash }) {
+async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice }) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     
     const preferenceData = {
@@ -21,7 +19,7 @@ async function createPaymentPreference({ giftId, playerName, giftHash }) {
           description: 'Desbloqueie a carta de amor gerada por IA + galeria de fotos para sua pessoa especial.',
           category_id: 'digital_goods',
           quantity: 1,
-          unit_price: GIFT_PRICE_BRL,
+          unit_price: unitPrice,
           currency_id: 'BRL',
         },
       ],

@@ -2,7 +2,7 @@ const paymentService = require('../services/paymentService');
 
 async function createCheckout(req, res, next) {
   try {
-    const { gift_id } = req.body;
+    const { gift_id, coupon_code } = req.body;
 
     if (!gift_id) {
       return res.status(400).json({ error: 'gift_id é obrigatório.' });
@@ -20,10 +20,46 @@ async function createCheckout(req, res, next) {
       });
     }
 
+    let unitPrice = parseInt(process.env.GIFT_PRICE || '990', 10) / 100;
+    let appliedCouponId = null;
+
+    if (coupon_code) {
+      const code = coupon_code.trim().toUpperCase();
+      const coupon = await global.prisma.coupon.findUnique({ where: { code } });
+
+      if (!coupon || !coupon.is_active || (coupon.usage_limit !== null && coupon.used_count >= coupon.usage_limit)) {
+        return res.status(400).json({ error: 'Cupom inválido ou expirado.' });
+      }
+
+      if (coupon.discount_type === 'fixed') {
+        unitPrice -= coupon.discount_value;
+      } else if (coupon.discount_type === 'percentage') {
+        unitPrice -= unitPrice * (coupon.discount_value / 100);
+      }
+
+      // Minimum price rule (e.g. MercadoPago limitation or business rule)
+      unitPrice = Math.max(1.00, unitPrice);
+
+      // Increment coupon usage and save to gift within a transaction
+      await global.prisma.$transaction([
+        global.prisma.coupon.update({
+          where: { id: coupon.id },
+          data: { used_count: { increment: 1 } },
+        }),
+        global.prisma.gift.update({
+          where: { id: gift.id },
+          data: { coupon_id: coupon.id },
+        })
+      ]);
+
+      appliedCouponId = coupon.id;
+    }
+
     const { checkoutUrl, sandboxUrl, preferenceId } = await paymentService.createPaymentPreference({
       giftId: gift.id,
       playerName: gift.player1_name,
       giftHash: gift.unique_hash,
+      unitPrice: Number(unitPrice.toFixed(2)),
     });
     
     return res.status(200).json({
