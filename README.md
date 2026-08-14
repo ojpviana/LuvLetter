@@ -1,6 +1,6 @@
 # 💌 LuvLetter
 
-O LuvLetter é uma plataforma simples para a criação de presentes digitais personalizados. A proposta é permitir que casais enviem cartas de amor geradas por IA, acompanhadas de uma galeria de fotos, usando uma interface limpa e elegante.
+O LuvLetter é uma plataforma para a criação de presentes digitais personalizados. A proposta é permitir que casais enviem cartas de amor geradas por IA, acompanhadas de uma galeria de fotos, usando uma interface limpa e elegante.
 
 ---
 
@@ -9,8 +9,8 @@ O LuvLetter é uma plataforma simples para a criação de presentes digitais per
 O foco da plataforma é gerar uma experiência de compra rápida e entregar um presente que pareça natural e autêntico:
 
 1. **Textos Humanos:** Usamos a API do Groq com instruções rigorosas para a IA gerar cartas casuais, que soam como mensagens reais do dia a dia, cortando a formalidade poética padrão dos modelos de linguagem.
-2. **Design Elegante:** A interface foge de visuais poluídos. O foco é no minimalismo, simulando um convite digital.
-3. **Fluxo Simples:** O usuário monta a página, revisa o texto, vê uma prévia bloqueada e faz o pagamento via Pix para liberar a URL final.
+2. **Design Elegante:** A interface foge de visuais poluídos. O foco é no minimalismo, simulando uma carta digital.
+3. **Fluxo Simples:** O usuário monta a carta, revisa o texto, vê uma prévia bloqueada e faz o pagamento via Pix para liberar a URL final.
 
 ---
 
@@ -19,12 +19,12 @@ O foco da plataforma é gerar uma experiência de compra rápida e entregar um p
 A arquitetura foi montada para ser leve, barata e fácil de manter:
 
 * **Frontend:** React 18 + Vite + Tailwind CSS.
-* **Backend:** Node.js com Express (configurado para rodar como Serverless Function).
+* **Backend:** Node.js com Express.
 * **Banco de Dados:** PostgreSQL (hospedado no Supabase) integrado via Prisma ORM.
 * **Inteligência Artificial:** Groq API para geração rápida de texto com o modelo Llama 3.
 * **Armazenamento de Fotos:** Cloudflare R2.
 * **Pagamentos:** Mercado Pago API com escuta de Webhooks.
-* **Deploy:** Vercel (Frontend e Backend hospedados juntos no mesmo domínio, sem problemas de CORS).
+* **Deploy:** Vercel.
 
 ---
 
