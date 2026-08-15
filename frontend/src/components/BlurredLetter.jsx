@@ -29,7 +29,7 @@ export default function BlurredLetter({ text, isBlurred = false, onPay }) {
               <img src="/logo-envelope.png" className="w-12 h-12 object-contain image-rendering-pixelated" alt="Logo LuvLetter" />
             </div>
             <h4 className="font-serif text-xl sm:text-2xl text-gray-900 mb-2">Continue lendo...</h4>
-            <p className="font-sans text-xs sm:text-sm text-gray-500 mb-6">Desbloqueie a carta completa e libere a cápsula digital eterna.</p>
+            <p className="font-sans text-xs sm:text-sm text-gray-500 mb-6">Desbloqueie a carta completa e a torne eterna.</p>
             
             {onPay && (
               <button 

@@ -74,7 +74,7 @@ export default function Checkout() {
       <div className="min-h-screen flex items-center justify-center ">
         <div className="text-center">
           <div className="font-serif text-3xl text-rose-300 animate-pulse">♥</div>
-          <p className="font-sans text-xs text-gray-400 uppercase tracking-widest mt-4">Carregando cápsula...</p>
+          <p className="font-sans text-xs text-gray-400 uppercase tracking-widest mt-4">Carregando carta...</p>
         </div>
       </div>
     )
@@ -154,7 +154,7 @@ export default function Checkout() {
             
             <Card className="p-8">
               <h2 className="font-sans text-xs text-gray-400 uppercase tracking-widest mb-6">
-                Detalhes da Cápsula
+                Detalhes da Carta
               </h2>
               <div className="space-y-4">
                 {[
@@ -177,7 +177,7 @@ export default function Checkout() {
                 Eternize este momento
               </h2>
               <p className="font-sans text-sm text-gray-500 mb-8">
-                Acesso vitalício à cápsula digital
+                Acesso vitalício à carta digital
               </p>
 
               {!appliedCoupon ? (

@@ -217,7 +217,7 @@ export default function Upload() {
             >
               {isProcessing
                 ? generating ? 'Escrevendo...' : 'Enviando...'
-                : `Gerar Cápsula (${photos.length} foto${photos.length !== 1 ? 's' : ''})`}
+                : `Gerar Carta (${photos.length} foto${photos.length !== 1 ? 's' : ''})`}
             </Button>
 
             <button

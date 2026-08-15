@@ -49,7 +49,7 @@ export default function Quest() {
         <div className="text-center space-y-4">
           <div className="font-serif text-4xl text-rose-300 animate-pulse">♥</div>
           <p className="font-sans text-xs text-gray-400 uppercase tracking-widest">
-            Preparando a cápsula...
+            Preparando a carta...
           </p>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function Quest() {
                   <div className="flex-1 h-[1px] bg-gray-100" />
                 </div>
                 <p className="font-sans text-xs text-gray-300 uppercase tracking-widest leading-loose">
-                  Esta carta foi eternizada na sua cápsula digital.<br />
+                  Esta carta foi eternizada digitalmente.<br />
                   Guarde este link para revisitar quando quiser.
                 </p>
               </motion.div>

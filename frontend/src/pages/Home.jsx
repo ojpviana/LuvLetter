@@ -152,6 +152,11 @@ export default function Home() {
         return
       }
     }
+    
+    if (currentStep.isInterests && formData.interests.length === 0) {
+      setError('Escolha pelo menos 1 interesse para continuar.')
+      return
+    }
 
     if (isLastStep) {
       handleSubmit()
@@ -176,7 +181,7 @@ export default function Home() {
       const res = await axios.post('/api/gifts', payload)
       navigate(`/upload/${res.data.id}`)
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao criar a cápsula. Tente novamente.')
+      setError(err.response?.data?.error || 'Erro ao criar a carta. Tente novamente.')
       setLoading(false)
     }
   }
@@ -273,7 +278,7 @@ export default function Home() {
                       })}
                     </div>
                     <p className="font-sans text-xs text-gray-400 italic">
-                      Opcional — você pode pular esta etapa.
+                      Obrigatório — escolha para nos ajudar a escrever a carta.
                     </p>
                   </div>
                 )
@@ -326,8 +331,6 @@ export default function Home() {
                     ? 'Criando...'
                     : isLastStep
                     ? 'Gerar Carta ♥'
-                    : currentStep.isInterests
-                    ? formData.interests.length > 0 ? 'Continuar' : 'Pular →'
                     : 'Continuar'}
                 </Button>
               </div>

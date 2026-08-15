@@ -18,19 +18,10 @@ const prisma = global.prisma;
 
 app.use(helmet());
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-].filter(Boolean);
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-      return callback(null, true);
-    }
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 const globalLimiter = rateLimit({
