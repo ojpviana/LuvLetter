@@ -75,83 +75,121 @@ async function createCheckout(req, res, next) {
 const crypto = require('crypto');
 
 function validateWebhookSignature(req) {
-  const signature = req.headers['x-signature'] || req.headers['x-mpt-signature'];
-  const requestId = req.headers['x-request-id'] || '';
-  const webhookSecret = process.env.WEBHOOK_SECRET;
-  
-  if (!signature || !webhookSecret) return false;
-  
-  const parts = signature.split(',');
-  let ts, hash;
-  
-  parts.forEach(part => {
-    const [key, value] = part.split('=');
-    if (key === 'ts') ts = value;
-    if (key === 'v1') hash = value;
-  });
+  try {
+    const signature = req.headers['x-signature'] || req.headers['x-mpt-signature'];
+    const requestId = req.headers['x-request-id'] || '';
+    const webhookSecret = process.env.WEBHOOK_SECRET;
+    
+    if (!signature || !webhookSecret) return false;
+    
+    const parts = signature.split(',');
+    let ts, hash;
+    
+    parts.forEach(part => {
+      const [key, value] = part.split('=');
+      if (key === 'ts') ts = value;
+      if (key === 'v1') hash = value;
+    });
 
-  if (!ts || !hash) return false;
+    if (!ts || !hash) return false;
 
-  const dataId = req.body?.data?.id || '';
-  const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
-  const hmac = crypto.createHmac('sha256', webhookSecret);
-  hmac.update(manifest);
-  const computedHash = hmac.digest('hex');
+    // Tentar extrair do body ou da query string
+    let dataId = req.query?.['data.id'] || req.query?.id || '';
+    
+    if (!dataId && req.body) {
+      if (Buffer.isBuffer(req.body)) {
+        try {
+          const parsed = JSON.parse(req.body.toString('utf8'));
+          dataId = parsed?.data?.id || '';
+        } catch(e){}
+      } else {
+        dataId = req.body?.data?.id || '';
+      }
+    }
 
-  return computedHash === hash;
+    const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
+    const hmac = crypto.createHmac('sha256', webhookSecret);
+    hmac.update(manifest);
+    const computedHash = hmac.digest('hex');
+
+    return computedHash === hash;
+  } catch (e) {
+    console.error('Error in signature validation:', e);
+    return false;
+  }
 }
 
 async function handleWebhook(req, res, next) {
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({ error: 'Payload vazio.' });
+    console.log('--- RECEBIDO WEBHOOK MERCADO PAGO ---');
+    console.log('Query:', req.query);
+    
+    // Tratamento robusto do Body (Raw/Buffer ou Object)
+    let bodyObj = {};
+    if (req.body) {
+      if (Buffer.isBuffer(req.body)) {
+        try { bodyObj = JSON.parse(req.body.toString('utf8')); } catch(e){}
+      } else if (typeof req.body === 'string') {
+        try { bodyObj = JSON.parse(req.body); } catch(e){}
+      } else {
+        bodyObj = req.body;
+      }
     }
+    console.log('Body extraído:', JSON.stringify(bodyObj).substring(0, 200));
 
     if (!process.env.WEBHOOK_SECRET) {
-      console.error('🚨 ERRO CRÍTICO: WEBHOOK_SECRET não está definido no ambiente de produção!');
-      return res.status(500).json({ error: 'Configuração do servidor inválida.' });
+      console.error('🚨 ERRO CRÍTICO: WEBHOOK_SECRET não está definido.');
+      return res.status(200).send('OK'); // Always return 200 to MP
     }
 
     if (!validateWebhookSignature(req)) {
-      console.warn('⚠️ Webhook signature validation failed!');
-      return res.status(403).json({ error: 'Assinatura inválida.' });
+      console.warn('⚠️ Webhook signature validation failed! Verifique se a secret está correta.');
+      // Opcionalmente retornar 403, mas 200 impede retries infinitos no MP se a secret mudou
+      return res.status(200).send('Signature invalid'); 
     }
 
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-    const { type, data } = body;
-
-    if (type !== 'payment') {
-      return res.status(200).json({ received: true });
+    const type = bodyObj?.type || bodyObj?.action || req.query?.type || req.query?.topic;
+    if (type !== 'payment' && type !== 'payment.created' && type !== 'payment.updated') {
+      console.log(`Ignorando evento do tipo: ${type}`);
+      return res.status(200).send('OK');
     }
 
-    const paymentId = data?.id;
+    const paymentId = bodyObj?.data?.id || req.query?.['data.id'] || req.query?.id;
     if (!paymentId || isNaN(Number(paymentId))) {
-      return res.status(400).json({ error: 'Payment ID inválido ou ausente no webhook.' });
+      console.warn('⚠️ Payment ID ausente ou inválido no payload.');
+      return res.status(200).send('OK');
     }
 
-    const paymentData = await paymentService.getPayment(paymentId);
+    console.log(`Processando pagamento ID: ${paymentId}`);
+    
+    try {
+      const paymentData = await paymentService.getPayment(paymentId);
+      const { status, external_reference: giftId } = paymentData;
 
-    const { status, external_reference: giftId } = paymentData;
+      console.log(`Status do MP: ${status} | Gift ID: ${giftId}`);
 
-    if (status === 'approved' && giftId) {
-      await global.prisma.gift.update({
-        where: { id: giftId },
-        data: {
-          is_paid: true,
-          payment_id: String(paymentId),
-        },
-      });
-
-      console.log(`✅ Gift ${giftId} desbloqueado! Payment ID: ${paymentId}`);
+      if (status === 'approved' && giftId) {
+        await global.prisma.gift.update({
+          where: { id: giftId },
+          data: {
+            is_paid: true,
+            payment_id: String(paymentId),
+          },
+        });
+        console.log(`✅ Gift ${giftId} marcado como PAGO com sucesso!`);
+      }
+    } catch (apiError) {
+      console.error(`Falha ao buscar detalhes do pagamento ${paymentId} na API do MP:`, apiError.message);
+      // Se a API do MP falhar (ex: rate limit), retornamos 500 para eles tentarem de novo depois
+      return res.status(500).json({ error: 'Erro temporário ao consultar API do MP' });
     }
 
-    // Always return 200 to acknowledge the webhook
-    return res.status(200).json({ received: true });
+    return res.status(200).send('OK');
   } catch (error) {
-    // Still return 200 to prevent MercadoPago retries on our internal errors
-    console.error('Webhook error:', error);
-    return res.status(200).json({ received: true, error: error.message });
+    console.error('🚨 ERRO FATAL NO WEBHOOK:', error);
+    // Para evitar 502 na Vercel (crash), capturamos tudo.
+    // Retornamos 500 para que o MP tente reenviar o evento mais tarde se foi erro de banco
+    return res.status(500).send('Internal Server Error');
   }
 }
 
