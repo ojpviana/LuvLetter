@@ -171,10 +171,11 @@ async function handleWebhook(req, res, next) {
           where: { id: giftId },
           data: {
             is_paid: true,
+            is_finalized: true, // Libera a carta automaticamente ao pagamento — sem etapa de aprovação manual
             payment_id: String(paymentId),
           },
         });
-        console.log(`✅ Gift ${giftId} marcado como PAGO com sucesso!`);
+        console.log(`✅ Gift ${giftId} marcado como PAGO e FINALIZADO com sucesso!`);
       }
     } catch (apiError) {
       console.error(`Falha ao buscar detalhes do pagamento ${paymentId} na API do MP:`, apiError.message);
