@@ -28,10 +28,10 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
       },
       back_urls: {
         success: `${frontendUrl}/quest/${giftHash}`,
-        failure: `${frontendUrl}/checkout/${giftId}?payment=failed`,
-        pending: `${frontendUrl}/checkout/${giftId}?payment=pending`,
+        failure: `${frontendUrl}/`,
+        pending: `${frontendUrl}/`,
       },
-      // MP rejects auto_return when back_url.success is not HTTPS (i.e. localhost)
+      // auto_return exige HTTPS na back_url.success — o MP rejeita com localhost
       ...(frontendUrl.startsWith('https') ? { auto_return: 'approved' } : {}),
       notification_url: `${process.env.APP_URL}/api/webhook`,
       external_reference: giftId,

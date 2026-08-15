@@ -63,7 +63,7 @@ async function createCheckout(req, res, next) {
     });
     
     return res.status(200).json({
-      checkout_url: process.env.NODE_ENV === 'production' ? checkoutUrl : sandboxUrl,
+      checkout_url: checkoutUrl,
       preference_id: preferenceId,
       message: '💳 Link de pagamento gerado com sucesso!',
     });

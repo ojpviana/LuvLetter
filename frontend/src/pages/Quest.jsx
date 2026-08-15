@@ -166,11 +166,12 @@ export default function Quest() {
                     Com amor, {gift?.player1_name}
                   </div>
                   <div className="font-sans text-xs text-gray-300 uppercase tracking-widest mt-2">
-                    {new Date(gift?.created_at).toLocaleDateString('pt-BR', {
+                    {new Intl.DateTimeFormat('pt-BR', {
                       day: '2-digit',
                       month: 'long',
                       year: 'numeric',
-                    })}
+                      timeZone: 'America/Sao_Paulo',
+                    }).format(new Date(gift?.created_at))}
                   </div>
                 </div>
               </Card>
