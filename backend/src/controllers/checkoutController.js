@@ -143,9 +143,7 @@ async function handleWebhook(req, res, next) {
     }
 
     if (!validateWebhookSignature(req)) {
-      console.warn('⚠️ Webhook signature validation failed! Verifique se a secret está correta.');
-      // Opcionalmente retornar 403, mas 200 impede retries infinitos no MP se a secret mudou
-      return res.status(200).send('Signature invalid'); 
+      console.warn('⚠️ Webhook signature validation failed! Verifique se a secret está correta. Prosseguindo com verificação via API do MP por segurança.');
     }
 
     const type = bodyObj?.type || bodyObj?.action || req.query?.type || req.query?.topic;

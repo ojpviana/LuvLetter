@@ -32,8 +32,7 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
         failure: `${frontendUrl}/`,
         pending: `${frontendUrl}/`,
       },
-      // auto_return exige HTTPS na back_url.success — o MP rejeita com localhost
-      ...(frontendUrl.startsWith('https') ? { auto_return: 'approved' } : {}),
+      auto_return: 'approved',
       notification_url: `${process.env.APP_URL}/api/webhook`,
       external_reference: giftId,
       payment_methods: {
