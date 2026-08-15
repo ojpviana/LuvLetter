@@ -17,7 +17,8 @@ export default function Quest() {
   const [error, setError] = useState('')
 
   const [searchParams] = useSearchParams()
-  const isAutoReturn = searchParams.get('status') === 'approved' || searchParams.get('collection_status') === 'approved'
+  // Aciona o polling se houver indícios de que o usuário acabou de voltar do Mercado Pago (independente do status)
+  const isAutoReturn = searchParams.has('payment_id') || searchParams.has('collection_id') || searchParams.has('preference_id') || searchParams.has('status')
   const pollCountRef = useRef(0)
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export default function Quest() {
 
   async function fetchQuest() {
     try {
-      const res = await axios.get(`/api/quest/${hash}`)
+      // Adiciona um timestamp na URL para garantir que o navegador não faça cache (Cache Buster)
+      const res = await axios.get(`/api/quest/${hash}?t=${new Date().getTime()}`)
       setGift(res.data)
       // Pagamento confirmado — limpa o ID pendente do localStorage
       localStorage.removeItem('pending_gift_id')
