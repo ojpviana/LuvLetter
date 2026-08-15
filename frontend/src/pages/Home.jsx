@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
 import Button from '../components/Button'
@@ -100,6 +100,12 @@ export default function Home() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [pendingGiftId, setPendingGiftId] = useState(null)
+
+  useEffect(() => {
+    const id = localStorage.getItem('pending_gift_id')
+    if (id) setPendingGiftId(id)
+  }, [])
 
   const currentStep = STEPS[step]
   const isLastStep = step === STEPS.length - 1
@@ -197,14 +203,31 @@ export default function Home() {
       <div className="relative z-10 flex flex-col min-h-screen">
 
         <header className="pt-16 pb-8 text-center px-4 animate-fade-in-up relative z-50">
-          <h1 className="font-serif text-3xl md:text-5xl text-gray-900 tracking-tight">
+          <Link to="/" className="font-serif text-3xl md:text-5xl text-gray-900 tracking-tight hover:text-rose-400 transition-colors">
             LuvLetter
-            <span className="block text-xl md:text-2xl mt-3 text-rose-400 font-sans tracking-normal font-medium">Cartas de Amor Geradas por IA</span>
-          </h1>
+          </Link>
+          <p className="font-sans text-rose-400 text-xl md:text-2xl mt-3 font-medium">Cartas de Amor Geradas por IA</p>
           <p className="font-sans text-gray-400 text-xs tracking-widest uppercase mt-3">
             Uma surpresa inesquecível
           </p>
         </header>
+
+        {pendingGiftId && (
+          <div className="px-4 max-w-lg mx-auto w-full animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="font-sans text-sm font-semibold text-rose-700">Você tem uma carta aguardando! 💌</p>
+                <p className="font-sans text-xs text-rose-500 mt-0.5">Finalize o desbloqueio antes de criar uma nova.</p>
+              </div>
+              <button
+                onClick={() => navigate(`/checkout/${pendingGiftId}`)}
+                className="font-sans text-xs font-bold text-white bg-rose-400 hover:bg-rose-500 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
+              >
+                Continuar →
+              </button>
+            </div>
+          </div>
+        )}
 
         <main className="flex-1 flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-lg animate-fade-in-up" style={{ animationDelay: '0.15s' }}>

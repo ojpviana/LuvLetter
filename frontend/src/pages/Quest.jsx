@@ -25,6 +25,8 @@ export default function Quest() {
     try {
       const res = await axios.get(`/api/quest/${hash}`)
       setGift(res.data)
+      // Pagamento confirmado — limpa o ID pendente do localStorage
+      localStorage.removeItem('pending_gift_id')
     } catch (err) {
       const status = err.response?.status
       if (status === 403) {

@@ -25,6 +25,7 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
       ],
       payer: {
         name: playerName,
+        email: 'pagamentos@luvletter.app', // O MP exige um email no payer para liberar a exibição do Pix no Checkout Pro
       },
       back_urls: {
         success: `${frontendUrl}/quest/${giftHash}`,
@@ -36,7 +37,13 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
       notification_url: `${process.env.APP_URL}/api/webhook`,
       external_reference: giftId,
       payment_methods: {
-        excluded_payment_types: [],
+        excluded_payment_types: [
+          { id: 'ticket' }, // Boleto
+          { id: 'debit_card' }, // Débito Virtual Caixa
+        ],
+        excluded_payment_methods: [
+          { id: 'pec' } // Lotérica
+        ],
         installments: 1,
       },
       expires: true,

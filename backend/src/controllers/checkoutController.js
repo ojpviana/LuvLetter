@@ -38,7 +38,7 @@ async function createCheckout(req, res, next) {
       }
 
       // Minimum price rule (e.g. MercadoPago limitation or business rule)
-      unitPrice = Math.max(1.00, unitPrice);
+      unitPrice = Math.max(0.01, unitPrice);
 
       // Increment coupon usage and save to gift within a transaction
       await global.prisma.$transaction([

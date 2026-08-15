@@ -24,6 +24,11 @@ async function validateCoupon(req, res, next) {
       return res.status(400).json({ error: 'Este cupom atingiu o limite de uso.' });
     }
 
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+
     return res.status(200).json({
       message: 'Cupom válido.',
       coupon: {

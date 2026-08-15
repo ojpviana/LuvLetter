@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
 import Button from '../components/Button'
@@ -19,6 +19,49 @@ export default function Checkout() {
   const [couponError, setCouponError] = useState('')
   const [validatingCoupon, setValidatingCoupon] = useState(false)
   const paymentStatus = searchParams.get('payment')
+  const [showExitModal, setShowExitModal] = useState(false)
+
+  const BASE_PRICE = 9.90
+  let finalPrice = BASE_PRICE
+
+  if (appliedCoupon) {
+    if (appliedCoupon.discount_type === 'fixed') {
+      finalPrice = Math.max(0.01, BASE_PRICE - appliedCoupon.discount_value)
+    } else if (appliedCoupon.discount_type === 'percentage') {
+      finalPrice = Math.max(0.01, BASE_PRICE - (BASE_PRICE * (appliedCoupon.discount_value / 100)))
+    }
+  }
+
+  const formatPriceParts = (val) => {
+    const parts = val.toFixed(2).replace('.', ',').split(',')
+    return { whole: parts[0], decimal: parts[1] }
+  }
+
+  const { whole, decimal } = formatPriceParts(finalPrice)
+
+  const handleLogoClick = useCallback(() => {
+    setShowExitModal(true)
+  }, [])
+
+  useEffect(() => {
+    const onPopState = (e) => {
+      e.preventDefault()
+      window.history.pushState(null, '', window.location.href)
+      setShowExitModal(true)
+    }
+    window.history.pushState(null, '', window.location.href)
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  const confirmExit = () => {
+    localStorage.removeItem('pending_gift_id')
+    navigate('/')
+  }
+
+  const cancelExit = () => {
+    setShowExitModal(false)
+  }
 
   useEffect(() => {
     fetchPreview()
@@ -43,8 +86,15 @@ export default function Checkout() {
     if (!couponCode.trim()) return
     setValidatingCoupon(true)
     setCouponError('')
+    setAppliedCoupon(null) // Limpa o estado antigo para forçar re-render com novo valor
     try {
-      const res = await axios.post('/api/coupons/validate', { code: couponCode })
+      const res = await axios.post(`/api/coupons/validate?t=${Date.now()}`, { code: couponCode }, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       setAppliedCoupon(res.data.coupon)
     } catch (err) {
       setCouponError(err.response?.data?.error || 'Cupom inválido')
@@ -62,6 +112,7 @@ export default function Checkout() {
         gift_id: id,
         coupon_code: appliedCoupon?.code
       })
+      localStorage.removeItem('pending_gift_id')
       window.location.href = res.data.checkout_url
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao gerar pagamento. Tente novamente.')
@@ -100,7 +151,12 @@ export default function Checkout() {
         <meta name="robots" content="noindex" />
       </Helmet>
       <header className="pt-12 pb-8 text-center px-4">
-        <h1 className="font-serif text-3xl text-gray-900">LuvLetter</h1>
+        <button
+          onClick={handleLogoClick}
+          className="font-serif text-3xl text-gray-900 hover:text-rose-400 transition-colors cursor-pointer"
+        >
+          LuvLetter
+        </button>
         <div className="flex items-center justify-center gap-4 mt-6">
           {['Dados', 'Fotos', 'Checkout'].map((s, i) => (
             <span
@@ -216,7 +272,7 @@ export default function Checkout() {
                       R$ 9,90
                     </div>
                     <div className="font-sans text-4xl font-light text-emerald-600">
-                      R$ 1<span className="text-2xl text-emerald-500">,00</span>
+                      R$ {whole}<span className="text-2xl text-emerald-500">,{decimal}</span>
                     </div>
                   </div>
                 ) : (
@@ -250,6 +306,29 @@ export default function Checkout() {
           </div>
         </div>
       </main>
+
+      {showExitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <Card className="max-w-sm w-full p-6 text-center shadow-2xl animate-fade-in-up">
+            <div className="font-serif text-4xl text-rose-300 mb-4">💔</div>
+            <h3 className="font-serif text-2xl text-gray-900 mb-2">Quase lá!</h3>
+            <p className="font-sans text-sm text-gray-500 mb-8 leading-relaxed">
+              Tem certeza que deseja sair? Sua carta já foi gerada e o progresso será perdido.
+            </p>
+            <div className="space-y-3">
+              <Button variant="primary" className="w-full" onClick={cancelExit}>
+                Quero ficar
+              </Button>
+              <button
+                onClick={confirmExit}
+                className="w-full py-2 font-sans text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Sair mesmo assim
+              </button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

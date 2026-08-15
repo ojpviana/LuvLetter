@@ -17,6 +17,10 @@ export default function Upload() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState('')
 
+  const handleLogoClick = useCallback(() => {
+    navigate('/')
+  }, [navigate])
+
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     setError('')
 
@@ -78,6 +82,7 @@ export default function Upload() {
       await axios.post(`/api/gifts/${id}/generate`)
       setUploadProgress(100)
 
+      localStorage.setItem('pending_gift_id', id)
       setTimeout(() => navigate(`/checkout/${id}`), 500)
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao enviar fotos. Tente novamente.')
@@ -95,6 +100,7 @@ export default function Upload() {
     } catch (_) {
       // Se falhar, o questController vai auto-gerar ao abrir a Quest
     } finally {
+      localStorage.setItem('pending_gift_id', id)
       navigate(`/checkout/${id}`)
     }
   }
@@ -108,7 +114,12 @@ export default function Upload() {
       </Helmet>
       
       <header className="pt-12 pb-8 text-center px-4">
-        <h1 className="font-serif text-3xl text-gray-900">LuvLetter</h1>
+        <button
+          onClick={handleLogoClick}
+          className="font-serif text-3xl text-gray-900 hover:text-rose-400 transition-colors cursor-pointer"
+        >
+          LuvLetter
+        </button>
         <div className="flex items-center justify-center gap-4 mt-6">
           {['Dados', 'Fotos', 'Checkout'].map((s, i) => (
             <span
