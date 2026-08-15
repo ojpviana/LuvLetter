@@ -9,6 +9,7 @@ const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Prisma singleton to avoid multiple instances in serverless environments
 if (!global.prisma) {

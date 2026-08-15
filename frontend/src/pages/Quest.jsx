@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -16,6 +16,10 @@ export default function Quest() {
   const [envelopeState, setEnvelopeState] = useState('closed')
   const [error, setError] = useState('')
 
+  const [searchParams] = useSearchParams()
+  const isAutoReturn = searchParams.get('status') === 'approved' || searchParams.get('collection_status') === 'approved'
+  const pollCountRef = useRef(0)
+
   useEffect(() => {
     fetchQuest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -27,16 +31,22 @@ export default function Quest() {
       setGift(res.data)
       // Pagamento confirmado — limpa o ID pendente do localStorage
       localStorage.removeItem('pending_gift_id')
+      setLoading(false)
     } catch (err) {
       const status = err.response?.status
       if (status === 403) {
+        if (isAutoReturn && pollCountRef.current < 5) {
+          // Webhook pode demorar alguns segundos. Fazer polling.
+          pollCountRef.current += 1
+          setTimeout(fetchQuest, 3000)
+          return
+        }
         setError('Este presente ainda não foi liberado. O pagamento está pendente.')
       } else if (status === 404) {
         setError('Carta não encontrada. Verifique o link recebido.')
       } else {
         setError('Erro ao carregar a carta. Tente novamente.')
       }
-    } finally {
       setLoading(false)
     }
   }
@@ -51,7 +61,7 @@ export default function Quest() {
         <div className="text-center space-y-4">
           <div className="font-serif text-4xl text-rose-300 animate-pulse">♥</div>
           <p className="font-sans text-xs text-gray-400 uppercase tracking-widest">
-            Preparando a carta...
+            {isAutoReturn && pollCountRef.current > 0 ? 'Confirmando pagamento...' : 'Preparando a carta...'}
           </p>
         </div>
       </div>

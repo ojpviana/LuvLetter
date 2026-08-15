@@ -28,9 +28,9 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
         email: 'pagamentos@luvletter.app', // O MP exige um email no payer para liberar a exibição do Pix no Checkout Pro
       },
       back_urls: {
-        success: `https://luvletter.online/quest/${giftHash}`,
-        failure: `https://luvletter.online/`,
-        pending: `https://luvletter.online/quest/${giftHash}`,
+        success: `${frontendUrl}/quest/${giftHash}`,
+        failure: `${frontendUrl}/`,
+        pending: `${frontendUrl}/quest/${giftHash}`,
       },
       auto_return: 'approved',
       notification_url: `${process.env.APP_URL}/api/webhook`,
