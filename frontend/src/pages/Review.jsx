@@ -15,6 +15,7 @@ function Spinner() {
 
 function SuccessScreen({ hash, player2Name }) {
   const [copied, setCopied] = useState(false)
+  // Usa pathname para limpar todos os query params do Mercado Pago da URL de compartilhamento
   const publicUrl = `${window.location.origin}/quest/${hash}`
 
   function handleCopy() {
