@@ -79,6 +79,7 @@ export default function Review() {
   const [regenCount, setRegenCount] = useState(0)
   const [finalizing, setFinalizing] = useState(false)
   const [error, setError] = useState('')
+  const [errorStatus, setErrorStatus] = useState(null)
   const [actionError, setActionError] = useState('')
   const [finalized, setFinalized] = useState(false)
   const [finalHash, setFinalHash] = useState('')
@@ -120,10 +121,13 @@ export default function Review() {
           setTimeout(fetchReview, 3000)
           return
         }
+        setErrorStatus(403)
         setError(err.response?.data?.error || 'Acesso negado. O pagamento precisa ser confirmado antes de revisar a carta.')
       } else if (status === 404) {
+        setErrorStatus(404)
         setError('Presente não encontrado.')
       } else {
+        setErrorStatus(500)
         setError('Não foi possível carregar a carta. Tente novamente.')
       }
     } finally {
@@ -177,6 +181,28 @@ export default function Review() {
         <div className="text-center">
           <div className="font-serif text-3xl text-rose-300 animate-pulse">♥</div>
           <p className="font-sans text-xs text-gray-400 uppercase tracking-widest mt-4">Carregando a carta...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (errorStatus === 403) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 text-center">
+        <div className="max-w-md w-full space-y-6">
+          <div className="text-6xl mb-6 opacity-80">⏳</div>
+          <div className="bg-white rounded-2xl border border-rose-100 shadow-sm p-8">
+            <h2 className="font-serif text-2xl text-gray-900 mb-3">Pagamento não processado</h2>
+            <p className="font-sans text-sm text-gray-500 leading-relaxed">
+              Se você acabou de pagar, aguarde alguns segundos e atualize esta página. Estamos esperando a confirmação do banco.
+            </p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-rose-300 hover:bg-rose-400 shadow-sm shadow-rose-200 text-white rounded-xl py-4 font-sans text-sm font-medium transition-colors"
+          >
+            ↻ Atualizar Página
+          </button>
         </div>
       </div>
     )
