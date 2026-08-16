@@ -43,7 +43,7 @@ export default function Quest() {
           setTimeout(fetchQuest, 3000)
           return
         }
-        setError('Este presente ainda não foi liberado. O pagamento está pendente.')
+        setError(err.response?.data?.error || 'Este presente ainda não foi liberado.')
       } else if (status === 404) {
         setError('Carta não encontrada. Verifique o link recebido.')
       } else {

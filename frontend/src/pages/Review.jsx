@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import axios from 'axios'
 import FloatingHearts from '../components/FloatingHearts'
@@ -83,6 +83,10 @@ export default function Review() {
   const [finalized, setFinalized] = useState(false)
   const [finalHash, setFinalHash] = useState('')
 
+  const [searchParams] = useSearchParams()
+  const isAutoReturn = searchParams.has('payment_id') || searchParams.has('collection_id') || searchParams.has('preference_id') || searchParams.has('status')
+  const pollCountRef = useRef(0)
+
   useEffect(() => {
     fetchReview()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,7 +94,7 @@ export default function Review() {
 
   async function fetchReview() {
     try {
-      const res = await axios.get(`/api/gifts/${id}/review`)
+      const res = await axios.get(`/api/gifts/${id}/review?t=${new Date().getTime()}`)
       setGift(res.data)
       const data = res.data.generated_letter
       if (typeof data === 'object' && data !== null) {
@@ -111,7 +115,12 @@ export default function Review() {
     } catch (err) {
       const status = err.response?.status
       if (status === 403) {
-        setError('Acesso negado. O pagamento precisa ser confirmado antes de revisar a carta.')
+        if (isAutoReturn && pollCountRef.current < 5) {
+          pollCountRef.current += 1
+          setTimeout(fetchReview, 3000)
+          return
+        }
+        setError(err.response?.data?.error || 'Acesso negado. O pagamento precisa ser confirmado antes de revisar a carta.')
       } else if (status === 404) {
         setError('Presente não encontrado.')
       } else {
