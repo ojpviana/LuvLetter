@@ -47,6 +47,10 @@ async function createPaymentPreference({ giftId, playerName, giftHash, unitPrice
     },
     expires: true,
     expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    statement_descriptor: 'LuvLetter',
+    metadata: {
+      business_name: 'LuvLetter',
+    },
   };
 
   console.log('Sending to MercadoPago:', JSON.stringify(preferenceData, null, 2));
