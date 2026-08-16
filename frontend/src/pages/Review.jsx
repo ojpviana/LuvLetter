@@ -113,6 +113,7 @@ export default function Review() {
         setFinalized(true)
         setFinalHash(res.data.unique_hash)
       }
+      setLoading(false)
     } catch (err) {
       const status = err.response?.status
       if (status === 403) {
@@ -130,7 +131,6 @@ export default function Review() {
         setErrorStatus(500)
         setError('Não foi possível carregar a carta. Tente novamente.')
       }
-    } finally {
       setLoading(false)
     }
   }
